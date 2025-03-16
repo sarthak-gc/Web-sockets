@@ -1,0 +1,255 @@
+<!-- Old project trying to make similar to this multiplayer-->
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tic Tac Toe</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        background-color: antiquewhite;
+        position: relative;
+      }
+
+      .game-name {
+        position: absolute;
+        top: 5%;
+      }
+
+      .container {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .start-game,
+      .restart-game {
+        text-align: center;
+        width: 150px;
+        padding: 20px;
+        cursor: pointer;
+        border: 2px solid;
+        border-radius: 30px;
+        background-color: antiquewhite;
+        position: absolute;
+      }
+
+      .restart-game {
+        display: none;
+        bottom: 5%;
+      }
+
+      .game-container {
+        width: 400px;
+        height: 400px;
+        display: grid;
+        grid-template-columns: repeat(3, auto);
+        border: 10px solid;
+        position: relative;
+        display: none;
+      }
+
+      .cross::after,
+      .cross::before {
+        content: "";
+        position: absolute;
+        background-color: black;
+        height: 8px;
+        width: 90px;
+      }
+
+      .cross::after {
+        rotate: 45deg;
+      }
+
+      .cross::before {
+        rotate: -45deg;
+      }
+
+      .circle::after {
+        content: "";
+        position: absolute;
+        height: 70px;
+        width: 70px;
+        border-radius: 50%;
+      }
+
+      .circle::before {
+        content: "";
+        position: absolute;
+        height: 70px;
+        width: 70px;
+        background-color: transparent;
+        border: 9px solid black;
+        border-radius: 50%;
+      }
+
+      .box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid;
+        background-color: rgba(255, 217, 146, 0.603);
+        position: relative;
+      }
+
+      .box:hover {
+        cursor: pointer;
+      }
+
+      .circle:hover,
+      .cross:hover {
+        cursor: not-allowed;
+      }
+
+      .final-message {
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        position: absolute;
+        display: flex;
+        align-items: center;
+        opacity: 0.8;
+        justify-content: center;
+        display: none;
+        color: white;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1 class="game-name">Tic Tac Toe</h1>
+      <div class="game-container">
+        <div class="area1 box"></div>
+        <div class="area2 box"></div>
+        <div class="area3 box"></div>
+        <div class="area4 box"></div>
+        <div class="area5 box"></div>
+        <div class="area6 box"></div>
+        <div class="area7 box"></div>
+        <div class="area8 box"></div>
+        <div class="area9 box"></div>
+      </div>
+      <div class="final-message"><span class="winner-symbol"></span> Won</div>
+
+      <button class="start-game">Start Game</button>
+      <button class="restart-game">Restart Game</button>
+    </div>
+    <script>
+      const winningPositions = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+      ];
+
+      let currentPlayer = "cross";
+      let startBtn = document.querySelector(".start-game");
+      let restartBtn = document.querySelector(".restart-game");
+      const box = document.querySelectorAll(".box");
+      let finalMessage = document.querySelector(".final-message");
+      let gameContainer = document.querySelector(".game-container");
+      let counter = 0;
+
+      startBtn.addEventListener("click", function () {
+        startBtn.style.display = "none";
+        restartBtn.style.display = "grid";
+        gameContainer.style.display = "grid";
+        startGame();
+      });
+
+      restartBtn.addEventListener("click", function () {
+        startBtn.style.display = "none";
+        finalMessage.style.display = "none";
+        removeAllSymbols();
+        gameContainer.style.display = "grid";
+        currentPlayer = "cross";
+        startGame();
+      });
+
+      function startGame() {
+        counter = 0;
+        box.forEach(function (element) {
+          element.addEventListener("click", function () {
+            if (
+              !element.classList.contains("circle") &&
+              !element.classList.contains("cross")
+            ) {
+              element.classList.add(currentPlayer);
+              counter++;
+              changePlayer();
+            }
+
+            if (checkWinner("circle")) {
+              finalMessage.style.display = "flex";
+              document.querySelector(".winner-symbol").textContent = " Circle ";
+              currentTurnMessage.style.display = "none";
+            } else if (checkWinner("cross")) {
+              finalMessage.style.display = "flex";
+              document.querySelector(".winner-symbol").textContent = " Cross ";
+              currentTurnMessage.style.display = "none";
+            } else if (counter === 9) {
+              draw();
+            }
+          });
+        });
+      }
+
+      function changePlayer() {
+        if (currentPlayer === "circle") {
+          currentPlayer = "cross";
+        } else {
+          currentPlayer = "circle";
+        }
+      }
+
+      function checkWinner(symbol) {
+        for (let i = 0; i < winningPositions.length; i++) {
+          const [a, b, c] = winningPositions[i];
+          if (
+            box[a].classList.contains(symbol) &&
+            box[b].classList.contains(symbol) &&
+            box[c].classList.contains(symbol)
+          ) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      function draw() {
+        finalMessage.style.display = "flex";
+        document.querySelector(".winner-symbol").textContent = " Nobody ";
+        currentTurnMessage.style.display = "none";
+      }
+
+      function removeAllSymbols() {
+        box.forEach(function (element) {
+          element.classList.remove("circle");
+          element.classList.remove("cross");
+        });
+      }
+    </script>
+  </body>
+</html> -->

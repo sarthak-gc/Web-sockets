@@ -1,0 +1,29 @@
+WebSockets are used to get real time responses from servers
+
+In traditional client server architecture, the client sends the request, and the server responds to that request, and the connection closes until the client sends another request to the server
+
+
+
+
+However, this has an issue as the server cannot send the response on its own, to get some update from the server without hitting the server, to solve this a solution called polling was introduced
+In polling the client machine periodically sends requests to the server to check if the server has new information or if it has been updated, this is just like the traditional client server architecture, the difference is that the process is done automatically so need to refresh the webpage manually
+
+
+However, polling is an overkill as in case of no new information in the server, the request and response is always empty, it's just asking for changes without sending anything and receiving no updates in return
+
+To solve this problem, there is another concept called long polling, where the server doesn't send the response immediately but rather holds for some time and then sends the response after detecting any changes or updates, this is better than regular polling but this only allows uni-directional communication ie. the server cant send the response without the client request, so it might not solve what we want
+
+Here, WebSockets come to rescue and solves the problem by allowing bi-directional communication, meaning both client and server can talk with one another at any point in time
+
+Here is more detail on how it works : 
+
+client first sends an HTTP request to the server (mostly get request) with additional headers (Upgrade: websocket, Connection: Upgrade, Sec-WebSocket-Key and Sec-WebSocket-Version ), these headers are used to let the server know that the client wants to use a protocol other than the default HTTP protocol
+
+if the server supports the protocol it sends status code of 101 which means switching protocol, and now the server follows the WebSockets protocol, if the server doesn't support the protocol it returns a status code of 400 bad request or 426 upgrade required
+
+once handshake is complete, full duplex communication between the server and the client is established
+
+extra info :
+
+sending one request then receiving one response is the characteristic of HTTP, for HTTP 1.0, the connection was open when new request was sent and immediately closed when the response was received from the server, however with HTTP 1.1 onwards the connection could exist for as long as necessary (using the Keep-Alive header),
+this is one of the concepts that the WebSockets follow in order to achieve full duplex communication, although HTTP 1.1 doesn't allow bidirectional communication, it introduced the concept where the connection between the server and the client could last as long as it was not closed, unlike HTTP 1.0, where the connection was closed after receiving a response to the request from the server

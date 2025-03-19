@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Socket.IO Client</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+  </head>
+  <body>
+    <h1>Socket.IO Client</h1>
+    <input type="text" id="message" placeholder="Type a message" />
+    <button onclick="test('enter')">Hi</button>
+    <button onclick="test('leave')">Bye</button>
+
+    <script>
+      const socket = io("http://localhost:4000");
+
+      socket.on("connect", () => {
+        console.log("connection");
+      });
+
+      //   // console.log("Event Listened from Server", message);
+      //   //   if (message == "hi") {
+      //   //     console.log("Hello  from Server");
+      //   //   }
+      //   //   if (message == "bye") {
+      //   //     console.log("Bye  from Server");
+      //   //   }
+
+      function test(condition) {
+        if (condition === "enter") {
+          socket.emit("hiEvent");
+        } else {
+          socket.emit("byeEvent");
+        }
+      }
+
+      socket.on("event", () => {
+        socket.on("hi", () => {
+          console.log("Hello  from Server");
+        });
+        // socket.on("bye", () => {
+        //   console.log("Bye  from Server");
+        // });
+      });
+
+      socket.on("hi", () => {
+        console.log("Hello  from Server");
+      });
+      socket.on("bye", () => {
+        console.log("Bye  from Server");
+      });
+      // socket.on("connect", () => {
+      //   console.log("Connected to server");
+      // });
+      //   socket.on("message", (msg) => {
+      //     const messagesList = document.getElementById("messages");
+      //     const listItem = document.createElement("li");
+      //     listItem.textContent = msg;
+      //     messagesList.appendChild(listItem);
+      //   });
+
+      //   function sendMessage() {
+      //     const messageInput = document.getElementById("message");
+      //     const message = messageInput.value;
+      //     socket.emit("message", message); // Send the message to the server
+      //     messageInput.value = ""; // Clear the input field
+      //   }
+      //
+    </script>
+  </body>
+</html>

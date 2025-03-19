@@ -8,19 +8,24 @@
       Socket.IO Chat
     </h2>
 
+    <div
+      class="bg-gray-600 w-full h-12 flex items-center justify-between gap-12 px-4"
+    >
+      <span class="userName"> </span>
+      <span class="typing"></span>
+    </div>
     <ul
       id="messageList"
-      class="bg-gray-700 p-4 rounded-lg shadow-lg overflow-y-auto h-80 mb-4 space-y-4"
-    >
-      <div class="typing" style="display: none"></div>
-    </ul>
+      class="bg-gray-700 p-4 rounded-b-lg shadow-lg overflow-y-auto h-80 mb-4 space-y-4"
+    ></ul>
 
     <form
       onsubmit="handleMsgSend(event)"
       class="flex items-center justify-between w-full space-x-4 mt-4"
     >
       <input
-        onchange="handleChange()"
+        onfocus="handleFocus()"
+        onblur="handleNotTyping()"
         type="text"
         id="message"
         placeholder="Type your message..."
@@ -46,16 +51,23 @@
     },
   });
 
-  function handleChange() {
+  function handleNotTyping() {
+    let message = document.querySelector("#message");
+    const msg = message.value.trim();
+    if (!msg) {
+      socket.emit("stopped typing");
+    }
+  }
+
+  function handleFocus() {
     socket.emit("typing");
   }
+
   function handleMsgSend(e) {
     e.preventDefault();
     let message = document.querySelector("#message");
     const msg = message.value.trim();
-    console.log(msg);
     if (!msg) {
-      alert("Cant send empty msg");
       return;
     }
     socket.emit("messageToServer", msg);
@@ -65,44 +77,43 @@
   socket.on("connect", () => {
     const id = socket.id;
     const typing = document.querySelector(".typing");
-
+    const userName = document.querySelector(".userName");
     if (!storedId) {
       localStorage.setItem("socketId", id);
     }
+    userName.innerHTML = storedId;
 
     socket.on("user typing", (message) => {
       typing.innerHTML = `<span class="text-white p-3 rounded-lg max-w-3/4">${message}</span>`;
-      typing.style.display = "block";
+
       messageList.scrollTop = messageList.scrollHeight;
     });
 
-    socket.on("messageToClient", (userId, message, date1) => {
-      const time = new Date(Date.now());
+    socket.on("user stopped typing", () => {
+      typing.innerText = "";
+    });
 
-      console.log(time.toLocaleTimeString());
-      console.log(date1);
+    socket.on("messageToClient", (userId, message) => {
       const li = document.createElement("li");
       const span = document.createElement("span");
 
-      span.innerText = `${userId} : ${message}`;
-      typing.style.display = "none";
+      span.innerText = `${message}`;
+      typing.innerText = "";
 
       span.classList.add(
-        "text-white",
         "p-3",
         "rounded-lg",
         "max-w-3/4",
         "break-words",
-        "whitespace-pre-wrap"
+        "whitespace-pre-wrap",
+        `${storedId === userId ? "bg-blue-500" : "bg-gray-500"}`
       );
       li.classList.add(
-        `${storedId === userId ? "bg-red-500" : "bg-blue-500"}`,
         "w-full",
         "mb-2",
         "flex",
-        "justify-start",
         "px-2",
-        "bg-blue-500"
+        `${storedId === userId ? "justify-end" : "justify-start"}`
       );
       li.appendChild(span);
       messageList.appendChild(li);
